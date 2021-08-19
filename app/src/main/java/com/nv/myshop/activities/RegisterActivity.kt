@@ -1,7 +1,6 @@
 package com.nv.myshop.activities
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.text.TextUtils
 import android.view.WindowManager
 import android.widget.Button
@@ -22,6 +21,7 @@ class RegisterActivity : BaseActivity() {
     private lateinit var et_password:EditText
     private lateinit var et_confirm_password:EditText
     private lateinit var cb_terms_and_condition:CheckBox
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -29,6 +29,8 @@ class RegisterActivity : BaseActivity() {
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        setupActionBar()
+
         et_first_name = findViewById(R.id.et_first_name)
         et_last_name= findViewById(R.id.et_last_name)
         et_email=findViewById(R.id.et_email)
@@ -42,11 +44,23 @@ class RegisterActivity : BaseActivity() {
         }
         val tv_login = findViewById(R.id.tv_login) as TextView
         tv_login.setOnClickListener {
-            // Launch the register screen when the user clicks on the text.
             val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
             startActivity(intent)
+            onBackPressed()
         }
     }
+    private fun setupActionBar() {
+
+        setSupportActionBar(toolbar_register_activity)
+
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
+        }
+        toolbar_register_activity.setNavigationOnClickListener { onBackPressed() }
+    }
+
     private fun validateRegisterDetails(): Boolean {
         return when {
 
@@ -85,27 +99,28 @@ class RegisterActivity : BaseActivity() {
                 false
             }
             else -> {
-                //showErrorSnackBar("Thanks for Registering!", false)
+
                 true
             }
         }
     }
     private fun registerUser() {
-        // Check with validate function if the entries are valid or not.
+
         if (validateRegisterDetails()) {
 
+            showProgressDialog(resources.getString(R.string.please_wait))
 
             val email: String = et_email.text.toString().trim { it <= ' ' }
             val password: String = et_email.text.toString().trim { it <= ' ' }
-            // Create an instance and create a register a user with email and password.
+
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(
                     OnCompleteListener<AuthResult> { task ->
 
-                        // If the registration is successfully done
+                        hideProgressDialog()
+
                         if (task.isSuccessful) {
 
-                            // Firebase registered user
                             val firebaseUser: FirebaseUser = task.result!!.user!!
 
                             showErrorSnackBar(
@@ -115,7 +130,7 @@ class RegisterActivity : BaseActivity() {
                             FirebaseAuth.getInstance().signOut()
                             finish()
                         } else {
-                            // If the registering is not successful then show error message.
+
                             showErrorSnackBar(task.exception!!.message.toString(), true)
                         }
                     })

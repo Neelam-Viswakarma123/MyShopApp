@@ -8,8 +8,6 @@ import com.nv.myshop.utils.MSPTextView
 
 open class BaseActivity : AppCompatActivity() {
 
-    private lateinit var mProgressDialog: Dialog
-
     fun showErrorSnackBar(message: String, errorMessage: Boolean) {
         val snackBar =
             Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG)
@@ -32,21 +30,4 @@ open class BaseActivity : AppCompatActivity() {
         }
         snackBar.show()
     }
-    fun showProgressDialog(text: String) {
-        mProgressDialog = Dialog(this)
-
-        mProgressDialog.setContentView(R.layout.dialog_progress)
-
-        mProgressDialog.tv_progress_text.text = text
-
-        mProgressDialog.setCancelable(false)
-
-        mProgressDialog.setCanceledOnTouchOutside(false)
-
-        mProgressDialog.show()
-    }
-    fun hideProgressDialog() {
-        mProgressDialog.dismiss()
-    }
-
 }

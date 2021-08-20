@@ -11,48 +11,29 @@ import android.widget.EditText
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.nv.myshop.R
+import com.nv.myshop.databinding.ActivityLoginBinding
 
 @Suppress("DEPRECATION")
 class LoginActivity : BaseActivity(), View.OnClickListener{
+
+    private lateinit var binding: ActivityLoginBinding
     private lateinit var et_email: EditText
     private lateinit var et_password: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding =   ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
-
-        val btn_login = findViewById<Button>(R.id.btn_login)
-        val tv_register = findViewById<TextView>(R.id.tv_register)
-        val tv_forgot_password = findViewById<TextView>(R.id.tv_forgot_password)
-
-        tv_forgot_password.setOnClickListener(this)
-        btn_login.setOnClickListener(this)
-        tv_register.setOnClickListener(this)
+        binding.tvRegister.setOnClickListener(this)
+        binding.btnLogin.setOnClickListener(this)
+        binding.tvForgotPassword.setOnClickListener(this)
     }
 
-    override fun onClick(v: View?) {
-        if (v != null) {
-            when (v.id) {
-
-                R.id.tv_forgot_password -> {
-
-                }
-                R.id.btn_login -> {
-                    logInRegisteredUser()
-                }
-
-                R.id.tv_register -> {
-
-                    val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-                    startActivity(intent)
-                }
-            }
-        }
-    }
     private fun validateLoginDetails(): Boolean {
         return when {
             TextUtils.isEmpty(et_email.text.toString().trim { it <= ' ' }) -> {
@@ -72,13 +53,11 @@ class LoginActivity : BaseActivity(), View.OnClickListener{
     private fun logInRegisteredUser() {
 
         if (validateLoginDetails()) {
-            showProgressDialog(resources.getString(R.string.please_wait))
+
             val email = et_email.text.toString().trim { it <= ' ' }
             val password = et_password.text.toString().trim { it <= ' ' }
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-
-                    hideProgressDialog()
 
                     if (task.isSuccessful) {
 
@@ -87,6 +66,25 @@ class LoginActivity : BaseActivity(), View.OnClickListener{
                         showErrorSnackBar(task.exception!!.message.toString(), true)
                     }
                 }
+        }
+    }
+
+    override fun onClick(v: View?) {
+        if (v != null) {
+            when (v.id) {
+
+                R.id.tv_forgot_password -> {
+
+                }
+                R.id.btn_login -> {
+                    logInRegisteredUser()
+                }
+
+                R.id.tv_register -> {
+                    val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
     }
 }

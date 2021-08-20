@@ -1,20 +1,22 @@
 package com.nv.myshop.activities
-import android.content.Intent
+
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.TextView
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.nv.myshop.R
+import com.nv.myshop.databinding.ActivityRegisterBinding
 
 @Suppress("DEPRECATION")
 class RegisterActivity : BaseActivity() {
+
+    private lateinit var binding: ActivityRegisterBinding
+
     private lateinit var et_first_name: EditText
     private lateinit var et_last_name:EditText
     private lateinit var et_email:EditText
@@ -24,43 +26,34 @@ class RegisterActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setupActionBar()
 
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        setupActionBar()
+            setupActionBar()
 
-        et_first_name = findViewById(R.id.et_first_name)
-        et_last_name= findViewById(R.id.et_last_name)
-        et_email=findViewById(R.id.et_email)
-        et_password=findViewById(R.id.et_password)
-        et_confirm_password=findViewById(R.id.et_confirm_password)
-        cb_terms_and_condition=findViewById(R.id.cb_terms_and_condition)
-
-        val btn_register = findViewById(R.id.btn_register) as Button
-        btn_register.setOnClickListener {
+        binding.btnRegister.setOnClickListener{
             registerUser()
         }
-        val tv_login = findViewById(R.id.tv_login) as TextView
-        tv_login.setOnClickListener {
-            val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
-            startActivity(intent)
+        binding.tvLogin.setOnClickListener{
             onBackPressed()
         }
     }
     private fun setupActionBar() {
 
-        setSupportActionBar(toolbar_register_activity)
-
+        setSupportActionBar(binding.toolbarRegisterActivity)
         val actionBar = supportActionBar
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
         }
-        toolbar_register_activity.setNavigationOnClickListener { onBackPressed() }
+        binding.toolbarRegisterActivity.setNavigationOnClickListener{
+            onBackPressed()
+        }
     }
-
     private fun validateRegisterDetails(): Boolean {
         return when {
 
@@ -108,16 +101,12 @@ class RegisterActivity : BaseActivity() {
 
         if (validateRegisterDetails()) {
 
-            showProgressDialog(resources.getString(R.string.please_wait))
-
             val email: String = et_email.text.toString().trim { it <= ' ' }
             val password: String = et_email.text.toString().trim { it <= ' ' }
 
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(
                     OnCompleteListener<AuthResult> { task ->
-
-                        hideProgressDialog()
 
                         if (task.isSuccessful) {
 

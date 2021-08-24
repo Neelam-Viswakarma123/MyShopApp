@@ -19,6 +19,11 @@ import kotlinx.android.synthetic.main.activity_register.*
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
             setupActionBar()
+
+            tv_login.setOnClickListener{
+                onBackPressed()
+            }
+
             btn_register.setOnClickListener {
                 registerUser()
             }

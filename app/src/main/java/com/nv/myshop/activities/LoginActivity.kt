@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.view.WindowManager
+import com.google.firebase.auth.FirebaseAuth
 import com.nv.myshop.R
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -36,11 +37,9 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
                 R.id.tv_forgot_password -> {
                 }
-
                 R.id.btn_login -> {
-                    validateLoginDetails()
+                    logInRegisteredUser()
                 }
-
                 R.id.tv_register -> {
                     val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                     startActivity(intent)
@@ -48,7 +47,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             }
         }
     }
-
     private fun validateLoginDetails(): Boolean {
         return when {
             TextUtils.isEmpty(et_email.text.toString().trim { it <= ' ' }) -> {
@@ -60,11 +58,29 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 false
             }
             else -> {
-                showErrorSnackBar("Your details are valid.", false)
                 true
             }
         }
     }
-    // END
+    private fun logInRegisteredUser() {
+
+        if (validateLoginDetails()){
+            showProgressDialog(resources.getString(R.string.please_wait))
+            val email = et_email.text.toString().trim { it <= ' ' }
+            val password = et_password.text.toString().trim { it <= ' ' }
+
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+
+                    hideProgressDialog()
+
+                    if (task.isSuccessful) {
+                        showErrorSnackBar("You are logged in successfully.", false)
+                    } else {
+                        showErrorSnackBar(task.exception!!.message.toString(), true)
+                    }
+                }
+        }
+    }
 
 }

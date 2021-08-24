@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("com.google.gms.google-services")
+    id("kotlin-android-extensions")
+
 }
 
 android {
@@ -26,9 +28,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-    buildFeatures{
-        viewBinding = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

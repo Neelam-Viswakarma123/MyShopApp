@@ -2,11 +2,14 @@ package com.nv.myshop.activities
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.WindowManager
+import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.nv.myshop.R
+import com.nv.myshop.firestore.FirestoreClass
+import com.nv.myshop.models.User
 import kotlinx.android.synthetic.main.activity_register.*
 
     @Suppress("DEPRECATION")
@@ -55,7 +58,6 @@ import kotlinx.android.synthetic.main.activity_register.*
                     showErrorSnackBar(resources.getString(R.string.err_msg_enter_email), true)
                     false
                 }
-
                 TextUtils.isEmpty(et_password.text.toString().trim { it <= ' ' }) -> {
                     showErrorSnackBar(resources.getString(R.string.err_msg_enter_password), true)
                     false
@@ -68,7 +70,6 @@ import kotlinx.android.synthetic.main.activity_register.*
                     )
                     false
                 }
-
                 et_password.text.toString().trim { it <= ' ' } != et_confirm_password.text.toString()
                     .trim { it <= ' ' } -> {
                     showErrorSnackBar(
@@ -94,23 +95,37 @@ import kotlinx.android.synthetic.main.activity_register.*
                 showProgressDialog(resources.getString(R.string.please_wait))
                 val email: String = et_email.text.toString().trim { it <= ' ' }
                 val password: String = et_email.text.toString().trim { it <= ' ' }
+
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(
                         OnCompleteListener<AuthResult> { task ->
-                            hideProgressDialog()
+
                             if (task.isSuccessful) {
                                 val firebaseUser: FirebaseUser = task.result!!.user!!
-                                showErrorSnackBar(
-                                    "You are registered successfully. Your user id is ${firebaseUser.uid}",
-                                    false
-                                )
-                                FirebaseAuth.getInstance().signOut()
 
-                                finish()
+                                val user = User(
+                                    firebaseUser.uid,
+                                    et_first_name.text.toString().trim { it <= ' ' },
+                                    et_last_name.text.toString().trim { it <= ' ' },
+                                    et_email.text.toString().trim { it <= ' ' }
+                                )
+                                FirestoreClass().registerUser(this@RegisterActivity, user)
                             } else {
+                                hideProgressDialog()
                                 showErrorSnackBar(task.exception!!.message.toString(), true)
                             }
                         })
             }
         }
+        fun userRegistrationSuccess() {
+            hideProgressDialog()
+            Toast.makeText(
+                this@RegisterActivity,
+                resources.getString(R.string.register_success),
+                Toast.LENGTH_SHORT
+            ).show()
+            FirebaseAuth.getInstance().signOut()
+            finish()
+        }
+
     }

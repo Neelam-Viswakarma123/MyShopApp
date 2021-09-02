@@ -3,10 +3,13 @@ package com.nv.myshop.activities
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import com.google.firebase.auth.FirebaseAuth
 import com.nv.myshop.R
+import com.nv.myshop.firestore.FirestoreClass
+import com.nv.myshop.models.User
 import kotlinx.android.synthetic.main.activity_login.*
 
 @Suppress("DEPRECATION")
@@ -22,20 +25,19 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
-
         tv_forgot_password.setOnClickListener(this)
 
         btn_login.setOnClickListener(this)
 
         tv_register.setOnClickListener(this)
-
     }
-
     override fun onClick(v: View?) {
         if (v != null) {
             when (v.id) {
 
                 R.id.tv_forgot_password -> {
+                    val intent = Intent(this@LoginActivity, ForgotPasswordActivity::class.java)
+                    startActivity(intent)
                 }
                 R.id.btn_login -> {
                     logInRegisteredUser()
@@ -66,21 +68,28 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
         if (validateLoginDetails()){
             showProgressDialog(resources.getString(R.string.please_wait))
+
             val email = et_email.text.toString().trim { it <= ' ' }
             val password = et_password.text.toString().trim { it <= ' ' }
 
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
 
-                    hideProgressDialog()
-
                     if (task.isSuccessful) {
-                        showErrorSnackBar("You are logged in successfully.", false)
+                                FirestoreClass().getUserDetails(this@LoginActivity)
                     } else {
+                        hideProgressDialog()
                         showErrorSnackBar(task.exception!!.message.toString(), true)
                     }
                 }
         }
     }
-
+    fun userLoggedInSuccess(user: User) {
+        hideProgressDialog()
+        Log.i("First Name: ", user.firstName)
+        Log.i("Last Name: ", user.lastName)
+        Log.i("Email: ", user.email)
+        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        finish()
+    }
 }

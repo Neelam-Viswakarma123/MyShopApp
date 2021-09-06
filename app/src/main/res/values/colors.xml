@@ -6,6 +6,7 @@
     <color name="purple_200">#ED2173</color>
     <color name="colorThemePink">#ED2173</color>
     <color name="colorThemeOrange">#F4442d</color>
+    <color name="colorAccent">#ED2173</color>
 
     <color name="colorPrimaryText">#222934</color>
     <color name="colorSecondaryText">#989898</color>
@@ -14,6 +15,7 @@
     <color name="teal_200">#ED2173</color>
     <color name="teal_700">#FF018786</color>
     <color name="colorWhite">#FFFFFFFF</color>
+    <color name="colorLightGrey">#F1F1F1</color>
 
     <color name="colorSnackBarSuccess">#8BC34A</color>
     <color name="colorSnackBarError">#F72400</color>
